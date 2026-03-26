@@ -11,8 +11,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- ══ ELEVENLABS CONVAI WIDGET ══ -->
-  <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
 
   <style>
     /* ══════════════════════════════════════════
@@ -1220,8 +1218,6 @@
       to   { transform: scaleY(1.2); }
     }
 
-    /* ElevenLabs widget hidden */
-    elevenlabs-convai { display: none; }
 
     /* ══ BOTTOM CTA BAR ══ */
     .cta-bar {
@@ -1820,6 +1816,7 @@
     <div class="cta-bar-btns">
       <button class="btn-get-live" id="btnGetLive" onclick="openBooking()">Get It Live →</button>
       <button class="btn-pricing" onclick="openBooking()">See Pricing</button>
+      <button class="btn-pricing" id="btnPreview" onclick="openWebsitePreview()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);">🌐 Website Preview</button>
     </div>
   </div>
 
@@ -1847,12 +1844,13 @@
       n8nGetDemoUrl:    '/api/demo',
       elAgentIdFallback: '',  // ElevenLabs agent ID to use if dynamic one fails
       agencyName:       'BryanTech Systems',
-      bookingLink:      'https://YOUR_BOOKING_LINK',
+      bookingLink:      'https://links.levelupservices.cc/widget/booking/HpjXWqkGl6beEniDI8Pp',
     };
 
     /* ══ STATE ══ */
     let demoData = {};
     let voiceCallActive = false;
+    let activeConversation = null;
     let voiceTimerInterval = null;
     let voiceSeconds = 0;
     let loadingTimers = [];
@@ -2164,7 +2162,7 @@
       document.getElementById('ctaBizName').textContent = bizName;
 
       // Phone header
-      document.getElementById('phoneHeaderName').textContent = 'AI Assistant Demo';
+      document.getElementById('phoneHeaderName').textContent = bizName + ' AI Assistant';
       document.getElementById('phoneHeaderStatus').textContent = `${bizName} · Online`;
       document.getElementById('agencyFooter').textContent = CONFIG.agencyName;
 
@@ -2284,6 +2282,9 @@
         const reply = data.reply || data.message || SMART_RESPONSES[smartIdx++ % SMART_RESPONSES.length];
         appendChatMsg(reply, 'ai');
         chatHistory.push({ role: 'assistant', content: reply });
+        if (/book|appointment|schedule|meeting|calendar|reserve/i.test(text) || /book|appointment|schedule|meeting|calendar|reserve/i.test(reply)) {
+          appendBookingCard();
+        }
       } catch {
         removeTypingIndicator();
         const fallback = SMART_RESPONSES[smartIdx++ % SMART_RESPONSES.length];
@@ -2317,21 +2318,41 @@
       if (el) el.remove();
     }
 
+    function appendBookingCard() {
+      const wrap = document.createElement('div');
+      wrap.className = 'chat-msg chat-msg-ai';
+      wrap.innerHTML = `
+        <div class="chat-bubble-ai" style="padding-bottom:10px">
+          📅 <strong>Book an appointment</strong><br>
+          <button onclick="openBooking()" style="margin-top:8px;padding:6px 14px;background:#3B82F6;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;">Schedule Now →</button>
+        </div>
+        <div class="chat-ts">just now</div>
+      `;
+      document.getElementById('chatMessages').appendChild(wrap);
+      document.getElementById('chatMessages').scrollTop = 99999;
+    }
+
     /* ══ VOICE CALL TOGGLE ══ */
-    function toggleVoiceCall() {
+    async function toggleVoiceCall() {
       const btn = document.getElementById('voiceBtn');
       const waves = document.getElementById('voiceWaves');
       const statusEl = document.getElementById('voiceStatus');
       const timerEl = document.getElementById('voiceTimer');
 
       if (!voiceCallActive) {
-        // Start call
+        const agentId = demoData.el_agent_id || CONFIG.elAgentIdFallback;
+        if (!agentId) {
+          statusEl.textContent = 'Voice agent not ready yet. Try again shortly.';
+          return;
+        }
+
+        // Update UI immediately
         voiceCallActive = true;
         btn.classList.add('active');
         btn.textContent = '⏹️';
         waves.classList.add('active');
         timerEl.style.display = 'block';
-        statusEl.textContent = 'AI is listening...';
+        statusEl.textContent = 'Connecting...';
 
         // Start timer
         voiceSeconds = 0;
@@ -2343,15 +2364,32 @@
           timerEl.textContent = `${h}:${m}:${s}`;
         }, 1000);
 
-        // Inject ElevenLabs widget
-        const agentId = demoData.el_agent_id || CONFIG.elAgentIdFallback;
-        if (agentId) {
-          let widget = document.querySelector('elevenlabs-convai');
-          if (!widget) {
-            widget = document.createElement('elevenlabs-convai');
-            document.body.appendChild(widget);
-          }
-          widget.setAttribute('agent-id', agentId);
+        // Start ElevenLabs SDK session
+        try {
+          const { Conversation } = await import('https://cdn.jsdelivr.net/npm/@11labs/client/+esm');
+          activeConversation = await Conversation.startSession({
+            agentId,
+            onConnect: () => {
+              statusEl.textContent = 'AI is listening...';
+            },
+            onDisconnect: () => {
+              if (voiceCallActive) toggleVoiceCall();
+            },
+            onError: (msg) => {
+              console.error('Voice error:', msg);
+              statusEl.textContent = 'Connection error. Please try again.';
+              if (voiceCallActive) toggleVoiceCall();
+            },
+          });
+        } catch (e) {
+          console.error('Voice init failed:', e);
+          statusEl.textContent = 'Voice unavailable. Please use chat instead.';
+          voiceCallActive = false;
+          btn.classList.remove('active');
+          btn.textContent = '🎙️';
+          waves.classList.remove('active');
+          timerEl.style.display = 'none';
+          clearInterval(voiceTimerInterval);
         }
       } else {
         // End call
@@ -2363,9 +2401,10 @@
         statusEl.textContent = 'Tap to start voice conversation';
         clearInterval(voiceTimerInterval);
 
-        // Remove widget
-        const widget = document.querySelector('elevenlabs-convai');
-        if (widget) widget.remove();
+        if (activeConversation) {
+          await activeConversation.endSession();
+          activeConversation = null;
+        }
       }
     }
 
@@ -2411,6 +2450,13 @@
     /* ══ BOOKING LINK ══ */
     function openBooking() {
       window.open(CONFIG.bookingLink, '_blank');
+    }
+
+    /* ══ WEBSITE PREVIEW ══ */
+    function openWebsitePreview() {
+      if (demoData.id) {
+        window.open(`/preview.html?id=${encodeURIComponent(demoData.id)}`, '_blank');
+      }
     }
 
     /* ══ URL PARAM: LOAD EXISTING DEMO ══ */

@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Website Preview — AI Demo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+
+  <style>
+    /* ══ DESIGN SYSTEM ══ */
+    :root {
+      --accent: #2563EB;
+      --accent-light: rgba(37,99,235,0.08);
+      --accent-mid: rgba(37,99,235,0.15);
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #94A3B8;
+      --bg: #FFFFFF;
+      --bg-soft: #F8FAFC;
+      --bg-subtle: #F1F5F9;
+      --border: #E2E8F0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
+      --shadow-lg: 0 20px 48px rgba(0,0,0,0.10), 0 8px 20px rgba(0,0,0,0.06);
+      --font-display: 'Playfair Display', serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius: 12px;
+      --radius-lg: 20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ══ DEMO BANNER ══ */
+    .demo-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: #0F172A;
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px;
+      font-size: 13px;
+      font-weight: 500;
+      gap: 12px;
+    }
+    .demo-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .demo-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .demo-banner-text {
+      color: #94A3B8;
+    }
+    .demo-banner-text strong {
+      color: #F8FAFC;
+    }
+    .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.08);
+      color: #F8FAFC;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-back:hover { background: rgba(255,255,255,0.15); }
+
+    /* ══ SPACER FOR BANNER ══ */
+    .banner-spacer { height: 44px; }
+
+    /* ══ NAV ══ */
+    .nav {
+      position: sticky;
+      top: 44px;
+      z-index: 90;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 68px;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .nav-logo {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .nav-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .nav-logo-fallback {
+      color: #fff;
+      font-weight: 800;
+      font-size: 16px;
+      font-family: var(--font-display);
+    }
+    .nav-name {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-cta {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .nav-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ══ HERO ══ */
+    .hero {
+      padding: 96px 48px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 64px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 4vw, 52px);
+      font-weight: 800;
+      line-height: 1.12;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+    .hero-headline em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+    .hero-btns {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 28px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,99,235,0.35); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 24px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .hero-trust {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .hero-trust-stars { color: #F59E0B; letter-spacing: 1px; }
+
+    /* Hero right: card */
+    .hero-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    .hero-card-header {
+      background: var(--accent);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-card-avatar {
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .hero-card-title { color: #fff; font-weight: 700; font-size: 15px; }
+    .hero-card-status {
+      display: flex; align-items: center; gap: 6px;
+      color: rgba(255,255,255,0.8); font-size: 12px;
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      background: #4ADE80;
+      border-radius: 50%;
+    }
+    .hero-card-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; }
+    .chat-bubble-preview {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px 14px 14px 4px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      max-width: 88%;
+      box-shadow: var(--shadow-sm);
+    }
+    .chat-bubble-user-preview {
+      background: var(--accent);
+      color: #fff;
+      border-radius: 14px 14px 4px 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 72%;
+      align-self: flex-end;
+    }
+    .hero-card-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex; gap: 10px;
+    }
+    .mock-input {
+      flex: 1;
+      background: var(--bg-subtle);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .mock-send {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    /* ══ SERVICES ══ */
+    .services {
+      background: var(--bg-soft);
+      border-top: 1px solid var(--border);
+      padding: 80px 48px;
+    }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3vw, 40px);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .section-sub {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 48px;
+      max-width: 560px;
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .service-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      cursor: default;
+    }
+    .service-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--accent);
+    }
+    .service-icon {
+      width: 44px; height: 44px;
+      background: var(--accent-light);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .service-name {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .service-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ══ CTA SECTION ══ */
+    .cta-section {
+      padding: 80px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+    .cta-left .section-title { margin-bottom: 16px; }
+    .contact-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+    .contact-icon {
+      width: 36px; height: 36px;
+      background: var(--accent-light);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .contact-form {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+    }
+    .form-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--text-primary);
+      background: #fff;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-input:focus { border-color: var(--accent); }
+    .form-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .form-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ══ FOOTER ══ */
+    .footer {
+      background: var(--text-primary);
+      color: rgba(255,255,255,0.5);
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* ══ LOADING STATE ══ */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      gap: 16px;
+    }
+    .loading-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 14px; color: var(--text-muted); }
+
+    /* ══ ERROR STATE ══ */
+    .error-screen {
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      gap: 12px;
+      text-align: center;
+      padding: 32px;
+    }
+    .error-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--text-primary); }
+    .error-sub { font-size: 15px; color: var(--text-secondary); }
+
+    /* ══ CONVAI WIDGET POSITIONING ══ */
+    elevenlabs-convai {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 768px) {
+      .nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; padding: 48px 20px; gap: 40px; }
+      .hero-card { display: none; }
+      .services { padding: 48px 20px; }
+      .cta-section { grid-template-columns: 1fr; padding: 48px 20px; gap: 40px; }
+      .footer { flex-direction: column; gap: 8px; padding: 24px 20px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading preview...</div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-screen" id="errorScreen">
+    <div style="font-size:48px">😕</div>
+    <div class="error-title">Demo Not Found</div>
+    <div class="error-sub">This demo may have expired or the link is invalid.</div>
+    <a href="/get-demo.html" style="margin-top:16px;color:var(--accent);font-weight:600;text-decoration:none;">← Generate a New Demo</a>
+  </div>
+
+  <!-- Demo Banner -->
+  <div class="demo-banner">
+    <div class="demo-banner-left">
+      <span class="demo-badge">Preview</span>
+      <span class="demo-banner-text">This is a <strong>demo preview</strong> — showing how your AI chatbot would look on your website</span>
+    </div>
+    <a href="/get-demo.html" class="btn-back">← Back to Demo Generator</a>
+  </div>
+
+  <!-- Page content (hidden until loaded) -->
+  <div id="pageContent" style="display:none">
+
+    <!-- Nav -->
+    <nav class="nav">
+      <a class="nav-brand" href="#">
+        <div class="nav-logo" id="navLogo">
+          <img id="navFavicon" src="" alt="" style="display:none" />
+          <span class="nav-logo-fallback" id="navInitial">B</span>
+        </div>
+        <span class="nav-name" id="navName">Business Name</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#">Services</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <button class="nav-cta" id="navCta">Get a Free Quote</button>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-left">
+        <div class="hero-eyebrow" id="heroEyebrow">Professional Services</div>
+        <h1 class="hero-headline" id="heroHeadline">
+          Quality Service<br><em>You Can Trust</em>
+        </h1>
+        <p class="hero-sub" id="heroSub">
+          We deliver exceptional results for our clients. Talk to our AI assistant anytime — it knows everything about our services, pricing, and availability.
+        </p>
+        <div class="hero-btns">
+          <button class="btn-primary" id="heroCtaBtn">Get Started Today</button>
+          <button class="btn-secondary">Learn More</button>
+        </div>
+        <div class="hero-trust">
+          <span class="hero-trust-stars">★★★★★</span>
+          <span>Trusted by hundreds of satisfied customers</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <div class="hero-card-avatar">🤖</div>
+            <div>
+              <div class="hero-card-title" id="cardTitle">AI Assistant</div>
+              <div class="hero-card-status"><div class="status-dot"></div> Online · Ready to help</div>
+            </div>
+          </div>
+          <div class="hero-card-body">
+            <div class="chat-bubble-preview" id="cardGreeting">Hi! I'm here to help answer questions about our services, pricing, and availability. What can I help you with?</div>
+            <div class="chat-bubble-user-preview">What services do you offer?</div>
+            <div class="chat-bubble-preview" id="cardReply">We offer a full range of services tailored to your needs. I'd be happy to walk you through everything — just ask!</div>
+          </div>
+          <div class="hero-card-footer">
+            <div class="mock-input">Type a message...</div>
+            <button class="mock-send">➤</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="services">
+      <div class="section-inner">
+        <div class="section-label">What We Do</div>
+        <h2 class="section-title">Our Services</h2>
+        <p class="section-sub" id="servicesSub">We specialize in delivering high-quality solutions. Ask our AI assistant for details on any service.</p>
+        <div class="services-grid" id="servicesGrid">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA / Contact -->
+    <section class="cta-section">
+      <div class="cta-left">
+        <div class="section-label">Get In Touch</div>
+        <h2 class="section-title" id="ctaTitle">Ready to Get Started?</h2>
+        <p class="section-sub" id="ctaSub">Our team is ready to help. Fill out the form or chat with our AI assistant on this page.</p>
+        <ul class="contact-list" id="contactList">
+          <!-- Injected by JS -->
+        </ul>
+      </div>
+      <div class="cta-right">
+        <div class="contact-form">
+          <div class="form-title">Send Us a Message</div>
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <input class="form-input" type="text" placeholder="John Smith" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input class="form-input" type="email" placeholder="john@example.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <input class="form-input" type="text" placeholder="Tell us how we can help..." />
+          </div>
+          <button class="form-btn" id="formBtn">Send Message</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span class="footer-brand" id="footerBrand">Business Name</span>
+      <span id="footerNiche">Professional Services</span>
+      <span>© 2025 · Powered by BryanTech AI</span>
+    </footer>
+
+  </div><!-- /pageContent -->
+
+  <script>
+    const SERVICE_ICONS = ['🔧','🏗️','🎨','📋','⚡','🛡️','📊','🚀','💡','🔑','🌿','🏆'];
+
+    async function loadDemo() {
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id');
+      if (!id) { showError(); return; }
+
+      try {
+        const res = await fetch(`/api/demo?id=${encodeURIComponent(id)}`);
+        if (!res.ok) throw new Error('Not found');
+        const data = await res.json();
+        if (data.error || !data.id) throw new Error('Invalid');
+        populatePage(data);
+      } catch(e) {
+        console.error(e);
+        showError();
+      }
+    }
+
+    function populatePage(d) {
+      const bizName  = d.business_name || 'Your Business';
+      const niche    = d.niche || 'Professional Services';
+      const headline = d.hero_headline || 'Quality Service You Can Trust';
+      const kb       = d.kb_json || {};
+      const services = kb.services || [];
+      const contact  = kb.contact  || '';
+      const hours    = kb.hours    || 'Contact us for hours';
+      const agentId  = d.el_agent_id || '';
+
+      // Apply brand color
+      if (d.brand_color && /^#[0-9A-Fa-f]{3,6}$/.test(d.brand_color)) {
+        document.documentElement.style.setProperty('--accent', d.brand_color);
+        // Derive light variant
+        document.documentElement.style.setProperty('--accent-light', hexToRgba(d.brand_color, 0.08));
+        document.documentElement.style.setProperty('--accent-mid',   hexToRgba(d.brand_color, 0.15));
+      }
+
+      // Nav
+      const initial = bizName.charAt(0).toUpperCase();
+      document.getElementById('navInitial').textContent = initial;
+      document.getElementById('navName').textContent = bizName;
+      if (d.favicon_url || d.url) {
+        try {
+          const domain = d.url ? new URL(d.url).hostname : '';
+          const favSrc = d.favicon_url || `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+          const favImg = document.getElementById('navFavicon');
+          favImg.src = favSrc;
+          favImg.style.display = 'block';
+          document.getElementById('navInitial').style.display = 'none';
+        } catch {}
+      }
+
+      // Hero
+      document.getElementById('heroEyebrow').textContent = niche;
+      document.getElementById('heroHeadline').innerHTML = formatHeadline(headline);
+      document.getElementById('heroSub').textContent = `We deliver exceptional ${niche.toLowerCase()} to our clients. Our AI assistant is available 24/7 — click the chat button below to get instant answers about our services, pricing, and availability.`;
+      document.getElementById('heroCtaBtn').textContent = 'Get Started Today';
+      document.getElementById('cardTitle').textContent = bizName + ' AI Assistant';
+      document.getElementById('cardGreeting').textContent = `Hi! I'm ${bizName}'s AI assistant. I can answer questions about our services, pricing, hours, and more. What can I help you with?`;
+
+      // Services grid
+      const grid = document.getElementById('servicesGrid');
+      const svcList = services.length > 0 ? services : ['Professional Consulting', 'Project Management', 'Quality Assurance', 'Customer Support'];
+      grid.innerHTML = svcList.map((s, i) => `
+        <div class="service-card">
+          <div class="service-icon">${SERVICE_ICONS[i % SERVICE_ICONS.length]}</div>
+          <div class="service-name">${escHtml(s)}</div>
+          <div class="service-desc">Ask our AI assistant for details about this service, including pricing and availability.</div>
+        </div>
+      `).join('');
+
+      // Contact section
+      document.getElementById('ctaTitle').textContent = `Ready to Work with ${bizName}?`;
+      document.getElementById('ctaSub').textContent = `Our team is ready to help you. Chat with our AI assistant on this page or send us a message directly.`;
+      const contactItems = [];
+      if (contact) contactItems.push({ icon: '📞', text: contact });
+      contactItems.push({ icon: '🕐', text: hours });
+      contactItems.push({ icon: '💬', text: 'AI chat available 24/7 on this page' });
+      document.getElementById('contactList').innerHTML = contactItems.map(c => `
+        <li class="contact-item">
+          <div class="contact-icon">${c.icon}</div>
+          <span>${escHtml(c.text)}</span>
+        </li>
+      `).join('');
+
+      // Footer
+      document.getElementById('footerBrand').textContent = bizName;
+      document.getElementById('footerNiche').textContent = niche;
+      document.getElementById('formBtn').textContent = `Send Message to ${bizName}`;
+
+      // Document title
+      document.title = `${bizName} — AI Demo Preview`;
+
+      // ElevenLabs widget
+      if (agentId) {
+        const widget = document.createElement('elevenlabs-convai');
+        widget.setAttribute('agent-id', agentId);
+        document.body.appendChild(widget);
+      }
+
+      // Show page
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('pageContent').style.display = 'block';
+    }
+
+    function showError() {
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('errorScreen').style.display = 'flex';
+    }
+
+    function formatHeadline(h) {
+      const words = h.split(' ');
+      const mid = Math.floor(words.length / 2);
+      const line1 = words.slice(0, mid).join(' ');
+      const line2 = words.slice(mid).join(' ');
+      return `${escHtml(line1)}<br><em>${escHtml(line2)}</em>`;
+    }
+
+    function hexToRgba(hex, alpha) {
+      const r = parseInt(hex.slice(1,3),16);
+      const g = parseInt(hex.slice(3,5),16);
+      const b = parseInt(hex.slice(5,7),16);
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    loadDemo();
+  </script>
+</body>
+</html>
