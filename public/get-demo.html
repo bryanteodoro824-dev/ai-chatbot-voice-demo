@@ -23,10 +23,12 @@
       --bg-surface-3: #1A1A2E;
       --bg-surface-4: #22223A;
 
-      --accent:       #F59E0B;
-      --accent-dim:   #D97706;
-      --accent-glow:  rgba(245, 158, 11, 0.15);
-      --accent-glow2: rgba(245, 158, 11, 0.08);
+      --accent:       #06b6d4;
+      --accent-dim:   #0891b2;
+      --accent-glow:  rgba(6, 182, 212, 0.15);
+      --accent-glow2: rgba(6, 182, 212, 0.08);
+      --accent2:      #f97316;
+      --accent2-glow: rgba(249, 115, 22, 0.15);
 
       --text-primary:   #F8FAFC;
       --text-secondary: #94A3B8;
@@ -36,7 +38,7 @@
       --success-glow: rgba(34, 197, 94, 0.15);
 
       --border:       rgba(255,255,255,0.07);
-      --border-accent: rgba(245,158,11,0.3);
+      --border-accent: rgba(6,182,212,0.3);
 
       --font-display: 'Fraunces', serif;
       --font-body:    'Figtree', sans-serif;
@@ -89,7 +91,7 @@
     }
     .nav-logo-mark {
       width: 32px; height: 32px;
-      background: linear-gradient(135deg, var(--accent), #B45309);
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
       font-size: 16px;
@@ -193,23 +195,52 @@
       opacity: 0.35;
     }
     .mesh-orb-1 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(245,158,11,0.4), transparent 70%);
-      top: -150px; left: -100px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(6,182,212,0.45), rgba(8,145,178,0.2) 50%, transparent 70%);
+      top: -200px; left: -150px;
       animation: orbDrift1 18s ease-in-out infinite alternate;
     }
     .mesh-orb-2 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(139,92,246,0.3), transparent 70%);
-      bottom: -100px; right: -50px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(249,115,22,0.35), rgba(234,88,12,0.15) 50%, transparent 70%);
+      bottom: -120px; right: -80px;
       animation: orbDrift2 22s ease-in-out infinite alternate;
     }
     .mesh-orb-3 {
-      width: 300px; height: 300px;
+      width: 350px; height: 350px;
       background: radial-gradient(circle, rgba(6,182,212,0.2), transparent 70%);
       top: 50%; left: 50%;
       transform: translate(-50%,-50%);
       animation: orbDrift3 14s ease-in-out infinite alternate;
+    }
+    .mesh-orb-4 {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(100,116,139,0.25), transparent 70%);
+      bottom: 25%; left: 25%;
+      animation: orbDrift2 19s ease-in-out infinite alternate;
+    }
+    .mesh-orb-5 {
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(249,115,22,0.2), transparent 70%);
+      top: 20%; right: 20%;
+      animation: orbDrift1 24s ease-in-out infinite alternate;
+    }
+
+    /* Wireframe grid overlay — shader hero style */
+    .mesh-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(6,182,212,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(6,182,212,0.07) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 0%, transparent 100%);
+      animation: gridPulse 8s ease-in-out infinite;
+    }
+    @keyframes gridPulse {
+      0%,100% { opacity: 0.6; }
+      50% { opacity: 1; }
     }
     @keyframes orbDrift1 {
       from { transform: translate(0, 0) scale(1); }
@@ -279,7 +310,23 @@
     }
     .pitch-headline em {
       font-style: italic;
-      color: var(--accent);
+      background: linear-gradient(90deg, #06b6d4, #ffffff, #f97316, #06b6d4);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 6s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(6,182,212,0.3));
+    }
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Glow on pitch headline */
+    .pitch-headline {
+      filter: drop-shadow(0 0 32px rgba(6,182,212,0.08));
     }
     .pitch-sub {
       font-size: 16px;
@@ -317,15 +364,25 @@
 
     /* Right — form card */
     .form-card {
-      background: rgba(13, 13, 26, 0.7);
+      background: rgba(13, 13, 26, 0.75);
       backdrop-filter: blur(24px);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(6,182,212,0.15);
       border-radius: var(--radius-xl);
       padding: 36px 32px;
+      position: relative;
       box-shadow:
-        0 0 0 1px rgba(245,158,11,0.06),
+        0 0 0 1px rgba(6,182,212,0.06),
         0 24px 64px rgba(0,0,0,0.5),
-        inset 0 1px 0 rgba(255,255,255,0.05);
+        inset 0 1px 0 rgba(6,182,212,0.08),
+        0 0 40px rgba(6,182,212,0.04);
+    }
+    .form-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(6,182,212,0.4), transparent);
+      border-radius: 100px;
     }
     .form-card-title {
       font-family: var(--font-display);
@@ -419,7 +476,7 @@
     .btn-submit {
       width: 100%;
       padding: 16px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+      background: linear-gradient(135deg, #06b6d4, #f97316);
       border: none;
       border-radius: var(--radius-sm);
       color: #000;
@@ -432,7 +489,7 @@
       transition: var(--transition);
       margin-top: 8px;
     }
-    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(245,158,11,0.35); }
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(6,182,212,0.35), 0 4px 12px rgba(249,115,22,0.2); }
     .btn-submit:active { transform: translateY(0); }
     .btn-submit::before {
       content: '';
@@ -680,7 +737,7 @@
     .progress-seg-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--accent), #FCD34D);
+      background: linear-gradient(90deg, #06b6d4, #f97316);
       border-radius: 100px;
       transition: width 0.6s ease;
     }
@@ -1244,7 +1301,7 @@
     .cta-bar-btns { display: flex; gap: 10px; flex-shrink: 0; }
     .btn-get-live {
       padding: 12px 24px;
-      background: var(--accent);
+      background: linear-gradient(135deg, #06b6d4, #f97316);
       border: none;
       border-radius: var(--radius-sm);
       color: #000;
@@ -1258,10 +1315,11 @@
       outline: 2px solid transparent;
       animation: gradBorder 3s linear infinite;
     }
-    .btn-get-live:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,158,11,0.4); }
+    .btn-get-live:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(6,182,212,0.4); }
     @keyframes gradBorder {
-      0%,100% { box-shadow: 0 0 0 2px var(--accent); }
-      50%      { box-shadow: 0 0 0 2px transparent; }
+      0%   { box-shadow: 0 0 0 2px rgba(6,182,212,0.8); }
+      50%  { box-shadow: 0 0 0 2px rgba(249,115,22,0.8); }
+      100% { box-shadow: 0 0 0 2px rgba(6,182,212,0.8); }
     }
     .btn-pricing {
       padding: 12px 20px;
@@ -1377,6 +1435,131 @@
       .btn-get-live, .btn-pricing { flex: 1; text-align: center; }
     }
 
+    /* ══ GOOEY NAV BUTTON ══ */
+    .nav-gooey-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .nav-gooey-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      filter: url(#gooey-filter);
+    }
+    .nav-gooey-arrow {
+      position: absolute;
+      right: 0;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #000;
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+      transform: translateX(-40px);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 0;
+    }
+    .nav-gooey-wrap:hover .nav-gooey-arrow {
+      transform: translateX(-74px);
+    }
+    .nav-gooey-main {
+      padding: 6px 20px;
+      border-radius: 100px;
+      background: #ffffff;
+      color: #000;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      height: 32px;
+      display: flex; align-items: center;
+      position: relative;
+      z-index: 1;
+      transition: background 0.2s;
+      font-family: var(--font-body);
+    }
+    .nav-gooey-main:hover { background: rgba(255,255,255,0.9); }
+
+    /* ══ SHADER OVERLAY (phase 1 background) ══ */
+    .shader-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 40% at 15% 50%, rgba(6,182,212,0.12), transparent),
+        radial-gradient(ellipse 50% 50% at 85% 50%, rgba(249,115,22,0.1), transparent);
+      animation: overlayShift 12s ease-in-out infinite alternate;
+    }
+    @keyframes overlayShift {
+      from { opacity: 0.5; transform: scale(1); }
+      to   { opacity: 1;   transform: scale(1.05); }
+    }
+
+    /* ══ ROTATING TEXT WIDGET ══ */
+    .rotating-widget {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 200;
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .widget-pulse-ring {
+      position: absolute;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #06b6d4 0deg,
+        #0891b2 60deg,
+        #f97316 120deg,
+        #06b6d4 180deg,
+        #ffffff 240deg,
+        #f97316 300deg,
+        #06b6d4 360deg
+      );
+      animation: widgetSpin 3s linear infinite, widgetPulse 2s ease-in-out infinite;
+      box-shadow: 0 0 20px rgba(6,182,212,0.6), 0 0 40px rgba(249,115,22,0.3);
+    }
+    .widget-pulse-ring::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      background: #06060F;
+    }
+    @keyframes widgetSpin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes widgetPulse {
+      0%,100% { box-shadow: 0 0 16px rgba(6,182,212,0.5), 0 0 32px rgba(249,115,22,0.2); }
+      50%      { box-shadow: 0 0 28px rgba(6,182,212,0.9), 0 0 56px rgba(249,115,22,0.4); }
+    }
+    .widget-rotating-text {
+      position: absolute;
+      inset: 0;
+      animation: widgetTextSpin 20s linear infinite;
+    }
+    @keyframes widgetTextSpin {
+      to { transform: rotate(360deg); }
+    }
+    .widget-center-icon {
+      position: relative;
+      z-index: 2;
+      font-size: 20px;
+      animation: widgetIconPulse 2s ease-in-out infinite;
+    }
+    @keyframes widgetIconPulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
     /* ══ REDUCED MOTION ══ */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -1388,6 +1571,36 @@
   </style>
 </head>
 <body>
+
+  <!-- ══ SVG FILTERS ══ -->
+  <svg class="absolute" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+    <defs>
+      <filter id="gooey-filter" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+        <feColorMatrix in="blur" mode="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" result="gooey" />
+        <feComposite in="SourceGraphic" in2="gooey" operator="atop" />
+      </filter>
+      <filter id="glass-effect" x="-50%" y="-50%" width="200%" height="200%">
+        <feTurbulence baseFrequency="0.006" numOctaves="1" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.5" />
+        <feColorMatrix type="matrix"
+          values="1 0 0 0 0.01  0 1 0 0 0.01  0 0 1 0 0.03  0 0 0 0.92 0" result="tint" />
+      </filter>
+      <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+        <feMerge>
+          <feMergeNode in="coloredBlur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <linearGradient id="grad-cyan-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#06b6d4" />
+        <stop offset="50%" stopColor="#ffffff" />
+        <stop offset="100%" stopColor="#f97316" />
+      </linearGradient>
+    </defs>
+  </svg>
 
   <!-- ══════════════════════════════════════════
        NAVIGATION
@@ -1410,6 +1623,16 @@
       <button class="btn-share" id="btnShare" onclick="openShareModal()" aria-label="Share demo link">
         <span>🔗</span> Share Demo
       </button>
+      <div class="nav-gooey-wrap" aria-hidden="true">
+        <div class="nav-gooey-inner">
+          <button class="nav-gooey-arrow" tabindex="-1" aria-hidden="true">
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 17L17 7M17 7H7M17 7V17"/>
+            </svg>
+          </button>
+          <button class="nav-gooey-main" onclick="openBooking()" tabindex="-1">Book a Call</button>
+        </div>
+      </div>
     </div>
   </nav>
 
@@ -1419,9 +1642,13 @@
   <section id="phase1" class="phase active" aria-label="Enter your website URL">
     <!-- Animated background -->
     <div class="mesh-bg" aria-hidden="true">
+      <div class="mesh-grid"></div>
       <div class="mesh-orb mesh-orb-1"></div>
       <div class="mesh-orb mesh-orb-2"></div>
       <div class="mesh-orb mesh-orb-3"></div>
+      <div class="mesh-orb mesh-orb-4"></div>
+      <div class="mesh-orb mesh-orb-5"></div>
+      <div class="shader-overlay"></div>
     </div>
     <div class="watermark" aria-hidden="true">AI</div>
 
@@ -1818,6 +2045,22 @@
       <button class="btn-pricing" onclick="openBooking()">See Pricing</button>
       <button class="btn-pricing" id="btnPreview" onclick="openWebsitePreview()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);">🌐 Website Preview</button>
     </div>
+  </div>
+
+  <!-- ══ ROTATING WIDGET ══ -->
+  <div class="rotating-widget" aria-hidden="true">
+    <div class="widget-pulse-ring"></div>
+    <svg class="widget-rotating-text" viewBox="0 0 100 100">
+      <defs>
+        <path id="widget-circle" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
+      </defs>
+      <text style="font-size:7.5px;fill:rgba(255,255,255,0.7);font-family:sans-serif;font-weight:600;letter-spacing:2px;">
+        <textPath href="#widget-circle" startOffset="0%">
+          AI DEMO • POWERED BY BRYANTECH • AI DEMO •
+        </textPath>
+      </text>
+    </svg>
+    <span class="widget-center-icon">⚡</span>
   </div>
 
   <!-- ══ SHARE MODAL ══ -->
@@ -2260,7 +2503,6 @@
     async function sendPhoneMsg(text) {
       if (!text) return;
       appendChatMsg(text, 'user');
-      chatHistory.push({ role: 'user', content: text });
       document.getElementById('chatInputField').value = '';
 
       // Show typing indicator
@@ -2281,6 +2523,7 @@
         removeTypingIndicator();
         const reply = data.reply || data.message || SMART_RESPONSES[smartIdx++ % SMART_RESPONSES.length];
         appendChatMsg(reply, 'ai');
+        chatHistory.push({ role: 'user', content: text });
         chatHistory.push({ role: 'assistant', content: reply });
         if (/book|appointment|schedule|meeting|calendar|reserve/i.test(text) || /book|appointment|schedule|meeting|calendar|reserve/i.test(reply)) {
           appendBookingCard();
@@ -2289,6 +2532,7 @@
         removeTypingIndicator();
         const fallback = SMART_RESPONSES[smartIdx++ % SMART_RESPONSES.length];
         appendChatMsg(fallback, 'ai');
+        chatHistory.push({ role: 'user', content: text });
         chatHistory.push({ role: 'assistant', content: fallback });
       }
     }
