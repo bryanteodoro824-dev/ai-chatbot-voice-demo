@@ -17,6 +17,8 @@
       --accent2: #f97316;
       --accent-light: rgba(6,182,212,0.08);
       --accent-mid: rgba(6,182,212,0.15);
+      --accent-soft: rgba(6,182,212,0.25);
+      --accent-glow: rgba(6,182,212,0.30);
       --text-primary: #0F172A;
       --text-secondary: #475569;
       --text-muted: #94A3B8;
@@ -602,14 +604,14 @@
     .nav-links a { color: rgba(255,255,255,0.6); }
     .nav-links a:hover { color: #06b6d4; }
     .nav-cta {
-      background: linear-gradient(135deg, #06b6d4, #f97316);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
       color: #000;
       border-radius: 100px;
       padding: 10px 22px;
       font-weight: 700;
     }
     .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
-    .nav-logo { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+    .nav-logo { background: var(--accent); }
     .nav-logo-fallback { color: #fff; }
 
     .hero-section-wrap {
@@ -635,7 +637,7 @@
     }
     /* Shader mesh orbs */
     .hero-orb-1 {
-      background: radial-gradient(circle, rgba(6,182,212,0.25), transparent 70%);
+      background: radial-gradient(circle, var(--accent-soft), transparent 70%);
       top: -200px; right: -60px;
       width: 600px; height: 600px;
     }
@@ -646,16 +648,16 @@
     }
 
     .hero-eyebrow {
-      background: rgba(6,182,212,0.08);
-      border: 1px solid rgba(6,182,212,0.2);
-      box-shadow: 0 0 0 4px rgba(6,182,212,0.04);
-      color: #06b6d4;
+      background: var(--accent-light);
+      border: 1px solid var(--accent-mid);
+      box-shadow: 0 0 0 4px var(--accent-light);
+      color: var(--accent);
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.12em;
       margin-bottom: 28px;
     }
-    .hero-eyebrow-dot { background: #06b6d4; }
+    .hero-eyebrow-dot { background: var(--accent); }
 
     .hero-headline {
       font-family: var(--font-body);
@@ -667,7 +669,7 @@
     }
     .hero-headline em {
       font-style: normal;
-      background: linear-gradient(135deg, #06b6d4 0%, #ffffff 40%, #f97316 100%);
+      background: linear-gradient(135deg, var(--accent) 0%, #ffffff 40%, var(--accent2) 100%);
       background-size: 200% 100%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -682,22 +684,79 @@
     .hero-sub { color: rgba(255,255,255,0.55); }
 
     .btn-primary {
-      background: linear-gradient(135deg, #06b6d4, #f97316);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
       color: #000;
       border-radius: 100px;
-      box-shadow: 0 4px 20px rgba(6,182,212,0.3);
+      box-shadow: 0 4px 20px var(--accent-glow);
       font-weight: 700;
     }
-    .btn-primary:hover { opacity: 0.9; box-shadow: 0 8px 30px rgba(6,182,212,0.45), 0 4px 14px rgba(249,115,22,0.2); }
+    .btn-primary:hover { opacity: 0.9; box-shadow: 0 8px 30px var(--accent-soft), 0 4px 14px rgba(249,115,22,0.2); }
     .btn-secondary {
       background: transparent;
       color: rgba(255,255,255,0.75);
       border-color: rgba(255,255,255,0.2);
     }
-    .btn-secondary:hover { border-color: #06b6d4; color: #06b6d4; background: rgba(6,182,212,0.08); }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
 
     .hero-trust { color: rgba(255,255,255,0.35); }
     .hero-trust-stars { color: #f97316; }
+
+    /* ══ NICHE-AWARE LIGHT HERO (real estate, dental, restaurant, law, health, default) ══ */
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .hero-section-wrap {
+      background:
+        radial-gradient(ellipse 70% 50% at 80% -10%, var(--accent-light) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 20% 100%, rgba(249,115,22,0.05) 0%, transparent 70%),
+        #FAFAF8;
+    }
+    body.niche-realestate .hero-section-wrap {
+      background:
+        radial-gradient(ellipse 70% 50% at 80% -10%, var(--accent-light) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 20% 100%, rgba(249,115,22,0.04) 0%, transparent 70%),
+        #FAF7F2; /* warm cream for real estate */
+    }
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .hero-section-wrap::before {
+      background-image:
+        linear-gradient(var(--accent-light) 1px, transparent 1px),
+        linear-gradient(90deg, var(--accent-light) 1px, transparent 1px);
+      animation: none;
+      opacity: 0.6;
+    }
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .hero-orb-1 {
+      background: radial-gradient(circle, var(--accent-light), transparent 70%);
+    }
+
+    /* Nav — light for non-tech */
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .nav {
+      background: rgba(255,255,255,0.96);
+      border-bottom: 1px solid var(--border);
+    }
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .nav-name { color: var(--text-primary); }
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .nav-links a { color: var(--text-secondary); }
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .nav-links a:hover { color: var(--accent); }
+
+    /* Hero text — dark for non-tech */
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .hero-headline {
+      color: var(--text-primary);
+    }
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .hero-headline em {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: none;
+    }
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .hero-sub { color: var(--text-secondary); }
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .hero-trust { color: var(--text-muted); }
+
+    /* Buttons — light variants for non-tech */
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .btn-secondary {
+      background: rgba(255,255,255,0.8);
+      color: var(--text-primary);
+      border-color: var(--border);
+    }
+    body:is(.niche-realestate,.niche-dental,.niche-restaurant,.niche-law,.niche-health,.niche-default) .btn-secondary:hover {
+      border-color: var(--accent); color: var(--accent); background: var(--accent-light);
+    }
   </style>
 </head>
 <body>
@@ -881,7 +940,26 @@
   <div class="booking-toast" id="bookingToast">✓ Appointment request sent!</div>
 
   <script>
-    const SERVICE_ICONS = ['🔧','🏗️','🎨','📋','⚡','🛡️','📊','🚀','💡','🔑','🌿','🏆'];
+    const NICHE_ICONS = {
+      realestate: ['🏠','🔑','🏗️','🌳','📋','💼','🏡','📍','🌆','💰','🏢','🔍'],
+      dental:     ['🦷','😁','🔬','💊','🩺','⚕️','🩻','🏥','✨','💉','📋','🌟'],
+      restaurant: ['🍽️','👨‍🍳','🥘','🌿','🍷','🎂','🥗','☕','🍰','🌶️','🥩','🍕'],
+      law:        ['⚖️','📜','🔒','🏛️','📋','💼','🤝','🛡️','📊','✍️','🗂️','🔍'],
+      health:     ['🩺','💊','🏥','🔬','🩻','⚕️','💉','🧬','🫀','🧪','📋','💚'],
+      tech:       ['🚀','💡','⚡','🛡️','📊','🔧','🤖','🌐','💻','📡','🔐','⚙️'],
+      default:    ['🔧','🏗️','🎨','📋','⚡','🛡️','📊','🚀','💡','🔑','🌿','🏆']
+    };
+
+    function getNicheClass(niche) {
+      const n = (niche || '').toLowerCase();
+      if (/real estate|home|property|realt|housing/.test(n)) return 'realestate';
+      if (/dental|dentist|orthodont/.test(n)) return 'dental';
+      if (/restaurant|food|cafe|caf|dining|bistro|eatery/.test(n)) return 'restaurant';
+      if (/law|legal|attorney|solicitor|barrister|counsel/.test(n)) return 'law';
+      if (/health|medical|clinic|doctor|physician|hospital|wellness/.test(n)) return 'health';
+      if (/tech|software|saas|digital|app|platform|startup/.test(n)) return 'tech';
+      return 'default';
+    }
     let DEMO_ID = '';
     let BIZ_NAME = '';
     let SESSION_ID = 'sess_' + Math.random().toString(36).slice(2, 12);
@@ -925,7 +1003,13 @@
         document.documentElement.style.setProperty('--accent', d.brand_color);
         document.documentElement.style.setProperty('--accent-light', hexToRgba(d.brand_color, 0.08));
         document.documentElement.style.setProperty('--accent-mid',   hexToRgba(d.brand_color, 0.15));
+        document.documentElement.style.setProperty('--accent-soft',  hexToRgba(d.brand_color, 0.25));
+        document.documentElement.style.setProperty('--accent-glow',  hexToRgba(d.brand_color, 0.30));
       }
+
+      // Niche-aware theming
+      const nicheClass = getNicheClass(niche);
+      document.body.classList.add('niche-' + nicheClass);
 
       // Nav
       const initial = bizName.charAt(0).toUpperCase();
@@ -952,9 +1036,10 @@
       // Services grid
       const grid = document.getElementById('servicesGrid');
       const svcList = services.length > 0 ? services : ['Professional Consulting', 'Project Management', 'Quality Assurance', 'Customer Support'];
+      const icons = NICHE_ICONS[nicheClass] || NICHE_ICONS.default;
       grid.innerHTML = svcList.map((s, i) => `
         <div class="service-card">
-          <div class="service-icon">${SERVICE_ICONS[i % SERVICE_ICONS.length]}</div>
+          <div class="service-icon">${icons[i % icons.length]}</div>
           <div class="service-name">${escHtml(s)}</div>
           <div class="service-desc">Ask our AI assistant for pricing, details, or to book an appointment for this service.</div>
         </div>
