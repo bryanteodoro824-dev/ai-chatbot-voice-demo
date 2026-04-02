@@ -889,34 +889,51 @@
       perspective: 1000px;
     }
 
+    /* Phone ambient glow */
+    .phone-glow {
+      position: absolute;
+      inset: -50px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, var(--brand-glow, rgba(6,182,212,0.22)), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(24px);
+      animation: phoneGlowPulse 4s ease-in-out infinite;
+    }
+    @keyframes phoneGlowPulse {
+      0%, 100% { opacity: 0.65; transform: scale(1); }
+      50%       { opacity: 1;    transform: scale(1.07); }
+    }
+
     /* Annotation badges */
     .phone-badge {
       position: absolute;
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 12px;
+      padding: 7px 14px;
       border-radius: 100px;
       font-size: 11px;
       font-weight: 600;
       border: 1px solid var(--border);
-      background: rgba(13,13,26,0.9);
-      backdrop-filter: blur(10px);
+      background: rgba(6,6,15,0.92);
+      backdrop-filter: blur(16px);
       white-space: nowrap;
       opacity: 0;
       transition: var(--transition-slow);
       z-index: 10;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.45);
     }
     .phone-badge.visible { opacity: 1; }
     .phone-badge-lead {
-      top: 40px; left: -60px;
+      top: 40px; left: -80px;
       transform: translateY(-8px);
       color: var(--success);
-      border-color: rgba(34,197,94,0.3);
+      border-color: rgba(34,197,94,0.35);
     }
     .phone-badge-lead.visible { transform: translateY(0); }
     .phone-badge-speed {
-      bottom: 80px; right: -60px;
+      bottom: 80px; right: -80px;
       transform: translateY(8px);
       color: var(--accent);
       border-color: var(--border-accent);
@@ -925,17 +942,19 @@
 
     /* iPhone frame */
     .iphone {
-      width: 280px;
-      background: linear-gradient(145deg, #3a3a3c, #1c1c1e, #2c2c2e, #1c1c1e);
-      border-radius: 48px;
+      width: 295px;
+      background: linear-gradient(145deg, #4a4a4c, #1c1c1e, #3c3c3e, #1c1c1e);
+      border-radius: 52px;
       padding: 14px;
       box-shadow:
-        0 0 0 1px rgba(255,255,255,0.08),
-        0 32px 80px rgba(0,0,0,0.7),
-        inset 0 1px 0 rgba(255,255,255,0.1);
+        0 0 0 1px rgba(255,255,255,0.10),
+        0 40px 100px rgba(0,0,0,0.8),
+        0 0 80px var(--brand-shadow, rgba(6,182,212,0.10)),
+        inset 0 1px 0 rgba(255,255,255,0.12);
       transform-style: preserve-3d;
       transition: transform 0.1s ease;
       position: relative;
+      z-index: 2;
     }
     /* Screen glare */
     .iphone::before {
@@ -952,7 +971,7 @@
 
     .iphone-screen {
       background: #fff;
-      border-radius: 36px;
+      border-radius: 40px;
       overflow: hidden;
       position: relative;
     }
@@ -1275,6 +1294,128 @@
       to   { transform: scaleY(1.2); }
     }
 
+
+    /* ══ PHASE 3 ENHANCEMENTS ══ */
+
+    /* Ambient brand glow behind entire phase */
+    #phase3 { position: relative; overflow: hidden; }
+    #phase3::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--brand-glow, rgba(6,182,212,0.14)), transparent 65%);
+      pointer-events: none;
+      animation: ambientDrift 14s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+    @keyframes ambientDrift {
+      from { transform: translate(0,0) scale(1);    opacity: 0.6; }
+      to   { transform: translate(-40px,40px) scale(1.1); opacity: 1; }
+    }
+
+    /* Ghost watermark biz name */
+    .demo-watermark {
+      position: absolute;
+      bottom: 8%; left: -1%;
+      font-family: var(--font-display);
+      font-size: clamp(60px, 10vw, 130px);
+      font-weight: 900;
+      color: rgba(255,255,255,0.025);
+      white-space: nowrap;
+      pointer-events: none;
+      letter-spacing: -0.04em;
+      z-index: 0;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    /* Eyebrow dot */
+    .demo-eyebrow .eyebrow-dot {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10px; color: #000; font-style: normal;
+      flex-shrink: 0;
+    }
+
+    /* Niche label */
+    .demo-niche-tag {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--bg-surface-3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .demo-niche-tag::before {
+      content: '◆';
+      font-size: 7px;
+      color: var(--accent);
+    }
+
+    /* Hero headline quote from scrape */
+    .demo-hero-headline {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      font-style: italic;
+      margin-bottom: 20px;
+      padding-left: 14px;
+      border-left: 2px solid var(--border-accent);
+      display: none;
+    }
+    .demo-hero-headline.has-content { display: block; }
+
+    /* Services pill rail */
+    .services-rail {
+      display: none;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 22px;
+    }
+    .service-pill {
+      padding: 5px 13px;
+      border-radius: 100px;
+      background: var(--bg-surface-3);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      animation: pillIn 0.3s ease both;
+    }
+    .service-pill:first-child {
+      background: var(--accent-glow);
+      border-color: var(--border-accent);
+      color: var(--accent);
+    }
+    @keyframes pillIn {
+      from { opacity: 0; transform: scale(0.88); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* Stat card accent stripe */
+    .demo-stat {
+      position: relative;
+      overflow: hidden;
+    }
+    .demo-stat::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      border-radius: 3px 0 0 3px;
+    }
 
     /* ══ BOTTOM CTA BAR ══ */
     .cta-bar {
@@ -1883,19 +2024,29 @@
        PHASE 3 — LIVE DEMO
   ══════════════════════════════════════════ -->
   <section id="phase3" class="phase" aria-label="Your personalized AI demo">
+    <!-- Ghost biz name watermark -->
+    <div class="demo-watermark" id="demoWatermark" aria-hidden="true"></div>
+
     <div class="demo-main">
 
       <!-- Left: Pitch copy -->
       <div class="demo-left">
         <div class="demo-eyebrow">
-          <span>⭐</span> PERSONALIZED FOR: <span id="bizNameEyebrow">YOUR BUSINESS</span>
+          <span class="eyebrow-dot">⭐</span> PERSONALIZED FOR: <span id="bizNameEyebrow">YOUR BUSINESS</span>
         </div>
         <h2 class="demo-headline">
           Meet <span class="biz-name" id="demoBizName">Your Business</span>'s<br>AI Employee
         </h2>
-        <p class="demo-sub">
-          <span class="hl-chat">Chat</span> with it. <span class="hl-voice">Talk</span> to it.
-        </p>
+
+        <!-- Niche tag — JS shows when data is available -->
+        <div class="demo-niche-tag" id="demoNicheTag"></div>
+
+        <!-- Services pill rail — JS populates -->
+        <div class="services-rail" id="servicesRail"></div>
+
+        <!-- Hero headline from scraped site — JS populates -->
+        <p class="demo-hero-headline" id="heroHeadline"></p>
+
         <p class="demo-body">
           Role-play real customer conversations for your business, right now. Ask it anything about your services, hours, pricing, or how to get started.
         </p>
@@ -1920,13 +2071,16 @@
         </div>
 
         <p class="demo-disclaimer">
-          This is an example personalized demo preview. When you become a customer your Live AI employees are fully trained on your business, services, FAQs, and booking system.
+          This is a personalized demo preview. When you become a customer, your Live AI employees are fully trained on your business, services, FAQs, and booking system.
         </p>
       </div>
 
       <!-- Right: iPhone mockup -->
       <div class="demo-right">
         <div class="phone-stage">
+          <!-- Brand ambient glow behind iPhone -->
+          <div class="phone-glow" id="phoneGlow" aria-hidden="true"></div>
+
           <!-- Annotation badges -->
           <div class="phone-badge phone-badge-lead" id="badgeLead" aria-label="Lead capture is enabled">
             📊 Lead capture: ON
@@ -2397,12 +2551,57 @@
 
     function populateDemoPhase() {
       const bizName = demoData.business_name || 'Your Business';
+      const kb = demoData.kb_json || {};
 
       // Headlines
       document.getElementById('demoBizName').textContent = bizName;
       document.getElementById('bizNameEyebrow').textContent = bizName.toUpperCase();
       document.getElementById('vpBizName').textContent = bizName;
       document.getElementById('ctaBizName').textContent = bizName;
+
+      // Ghost watermark
+      document.getElementById('demoWatermark').textContent = bizName;
+
+      // Niche tag — safe textContent
+      const nicheEl = document.getElementById('demoNicheTag');
+      if (kb.niche) {
+        nicheEl.textContent = kb.niche;
+        nicheEl.style.display = 'inline-flex';
+      }
+
+      // Services rail — safe DOM creation, no innerHTML
+      const railEl = document.getElementById('servicesRail');
+      const allServices = (kb.services || []).slice(0, 6);
+      if (allServices.length > 0) {
+        railEl.textContent = '';
+        allServices.forEach(s => {
+          const pill = document.createElement('span');
+          pill.className = 'service-pill';
+          pill.textContent = s;
+          railEl.appendChild(pill);
+        });
+        railEl.style.display = 'flex';
+      }
+
+      // Hero headline quote — safe textContent
+      const heroEl = document.getElementById('heroHeadline');
+      if (kb.hero_headline) {
+        heroEl.textContent = '\u201c' + kb.hero_headline + '\u201d';
+        heroEl.classList.add('has-content');
+      }
+
+      // Brand color — CSS variable for ambient glow + iPhone shadow
+      const brandColor = demoData.brand_color || kb.brand_color_hint;
+      if (brandColor) {
+        try {
+          const hex = brandColor.startsWith('#') ? brandColor : '#' + brandColor;
+          const r = parseInt(hex.slice(1,3),16);
+          const g = parseInt(hex.slice(3,5),16);
+          const b = parseInt(hex.slice(5,7),16);
+          document.documentElement.style.setProperty('--brand-glow',   `rgba(${r},${g},${b},0.22)`);
+          document.documentElement.style.setProperty('--brand-shadow', `rgba(${r},${g},${b},0.10)`);
+        } catch {}
+      }
 
       // Phone header
       document.getElementById('phoneHeaderName').textContent = bizName + ' AI Assistant';
@@ -2426,8 +2625,7 @@
       }
 
       // Chat welcome message + chips
-      const kb = demoData.kb_json || {};
-      const services = (kb.services || []).slice(0, 3);
+      const services = allServices.slice(0, 3);
       const chips = services.length > 0
         ? services.map(s => `What about ${s}?`)
         : ['What services do you offer?', 'What are your hours?', 'How do I get a quote?'];
