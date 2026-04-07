@@ -1214,7 +1214,7 @@
       width: 100%;
       text-align: left;
     }
-    .choose-btn:hover { border-color: #3B82F6; background: #EFF6FF; }
+    .choose-btn:hover { border-color: var(--brand, #3B82F6); background: var(--brand-muted, #EFF6FF); }
     .choose-btn .btn-icon { font-size: 18px; }
     .phone-footer {
       padding: 8px 14px;
@@ -1224,7 +1224,7 @@
       font-size: 10px;
       color: #94A3B8;
     }
-    .phone-footer span { color: #2563EB; font-weight: 600; }
+    .phone-footer span { color: var(--brand, #2563EB); font-weight: 600; }
     .phone-home-bar {
       display: flex; justify-content: center; padding: 8px;
       background: #fff;
@@ -1263,7 +1263,7 @@
       line-height: 1.5;
     }
     .chat-bubble-user {
-      background: #2563EB;
+      background: var(--brand, #2563EB);
       border-radius: 14px 14px 4px 14px;
       padding: 9px 12px;
       font-size: 12px;
@@ -1311,17 +1311,17 @@
     }
     .chat-chip {
       padding: 5px 10px;
-      background: #EFF6FF;
-      border: 1px solid #BFDBFE;
+      background: var(--brand-muted, #EFF6FF);
+      border: 1px solid var(--brand-border, #BFDBFE);
       border-radius: 100px;
       font-size: 10px;
-      color: #1D4ED8;
+      color: var(--brand, #1D4ED8);
       cursor: pointer;
       font-weight: 500;
       white-space: nowrap;
       transition: 0.15s ease;
     }
-    .chat-chip:hover { background: #DBEAFE; }
+    .chat-chip:hover { background: var(--brand-muted, #DBEAFE); opacity: 0.85; }
 
     /* Chat input */
     .chat-input-area {
@@ -1344,7 +1344,7 @@
     .chat-attribution { font-size: 9px; color: #CBD5E1; white-space: nowrap; }
     .chat-send-btn {
       width: 28px; height: 28px;
-      background: #2563EB;
+      background: var(--brand, #2563EB);
       border-radius: 50%;
       border: none;
       cursor: pointer;
@@ -1376,7 +1376,7 @@
     .voice-ripple {
       position: absolute;
       border-radius: 50%;
-      background: rgba(59,130,246,0.12);
+      background: var(--brand-muted, rgba(59,130,246,0.12));
       animation: voiceRipple 2s ease-out infinite;
     }
     .voice-ripple:nth-child(1) { width: 80px; height: 80px; animation-delay: 0s; }
@@ -1391,12 +1391,12 @@
       z-index: 2;
       width: 64px; height: 64px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #2563EB, #1D4ED8);
+      background: var(--brand, #2563EB);
       border: none;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       font-size: 26px;
-      box-shadow: 0 6px 20px rgba(37,99,235,0.4);
+      box-shadow: 0 6px 20px var(--brand-muted, rgba(37,99,235,0.4));
       transition: 0.2s ease;
     }
     .voice-btn:hover { transform: scale(1.05); }
@@ -1413,7 +1413,7 @@
     .voice-waves.active { display: flex; }
     .wave-bar {
       width: 4px;
-      background: #3B82F6;
+      background: var(--brand, #3B82F6);
       border-radius: 2px;
       animation: waveBar 0.8s ease-in-out infinite alternate;
     }
@@ -2303,7 +2303,7 @@
                     onkeydown="if(event.key==='Enter') sendChatMsg()"
                     aria-label="Type your message"
                   />
-                  <span class="chat-attribution">Claude Haiku</span>
+                  <span class="chat-attribution">Claude AI</span>
                   <button class="chat-send-btn" onclick="sendChatMsg()" aria-label="Send message">➤</button>
                 </div>
                 <div class="phone-home-bar" aria-hidden="true"><div class="home-bar"></div></div>
@@ -2638,14 +2638,23 @@
     let countdownSecs = 105;
     let chatHistory = [];
 
-    /* ══ SMART FALLBACK RESPONSES (used if n8n is unavailable) ══ */
-    const SMART_RESPONSES = [
-      "Great question! Based on our services, I'd be happy to help you with that. Could you tell me a bit more about what you're looking for?",
-      "Thanks for asking! We specialize in exactly that kind of work. Would you like to know more about our pricing or availability?",
-      "Absolutely! That's one of our most popular services. We can usually get started within a few days. Want me to connect you with our team?",
-      "I understand what you need. We've helped many clients with similar requests. What's the best way to reach you for a follow-up?",
-    ];
-    let smartIdx = 0;
+    /* ══ HTML ENTITY DECODER (multi-pass — handles double-encoded entities) ══ */
+    const HTML_ENTITIES = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#039;': "'", '&apos;': "'", '&nbsp;': ' ', '&mdash;': '—', '&ndash;': '–', '&lsquo;': '\u2018', '&rsquo;': '\u2019', '&ldquo;': '\u201c', '&rdquo;': '\u201d' };
+    function decodeHtml(str) {
+      if (!str || typeof str !== 'string') return str;
+      let s = str, prev;
+      do {
+        prev = s;
+        s = s
+          .replace(/&[a-zA-Z]+;/g, m => HTML_ENTITIES[m] || m)
+          .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)))
+          .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
+      } while (s !== prev);
+      return s;
+    }
+
+    /* ══ FALLBACK RESPONSE (used if chat API is unavailable) ══ */
+    const CHAT_ERROR_MSG = "I'm having a brief connection issue. Please try again in a moment.";
 
     /* ══ PHASE MANAGEMENT ══ */
     function showPhase(n) {
@@ -2815,19 +2824,20 @@
     /* ══ LOADING ANIMATION ══ */
     const LOG_LINES = [
       [0,    "Connecting to website scraper..."],
-      [1500, (url) => `Fetching ${url}...`],
-      [4000, "Found homepage content..."],
-      [7000, "Discovered additional pages..."],
-      [10000,"Extracting service information..."],
-      [15000,"Analyzing business content..."],
-      [18000,"Detected business niche..."],
-      [22000,"Extracting FAQ items..."],
-      [26000,"Processing pricing information..."],
-      [32000,"Building knowledge base structure..."],
-      [38000,"Formatting AI training data..."],
-      [44000,"Knowledge base complete..."],
+      [1500, (url) => `Mapping site structure: ${url}...`],
+      [4000, "Discovered pages: About, Services, Contact, FAQs..."],
+      [7000, "Scraping 4 pages in parallel..."],
+      [10000,"Page 1 complete — Homepage content extracted..."],
+      [13000,"Page 2 complete — Services & offerings extracted..."],
+      [16000,"Page 3 complete — About & team information..."],
+      [20000,"Page 4 complete — Contact & FAQ details..."],
+      [24000,"Analyzing combined business content with Claude AI..."],
+      [28000,"Detected business niche and category..."],
+      [32000,"Extracting brand colors and style hints..."],
+      [38000,"Building AI knowledge base structure..."],
+      [44000,"Knowledge base complete — full context ready..."],
       [50000,"Initializing voice agent..."],
-      [55000,"Configuring ElevenLabs ConvAI..."],
+      [55000,"Configuring ElevenLabs ConvAI system prompt..."],
       [62000,"Voice agent trained and ready..."],
       [68000,"Running final checks..."],
       [72000,"Demo is ready! ✓"],
@@ -2934,7 +2944,7 @@
     }
 
     function populateDemoPhase() {
-      const bizName = demoData.business_name || 'Your Business';
+      const bizName = decodeHtml(demoData.business_name) || 'Your Business';
       const kb = demoData.kb_json || {};
 
       // Headlines
@@ -2949,13 +2959,13 @@
       // Niche tag — safe textContent
       const nicheEl = document.getElementById('demoNicheTag');
       if (kb.niche) {
-        nicheEl.textContent = kb.niche;
+        nicheEl.textContent = decodeHtml(kb.niche);
         nicheEl.style.display = 'inline-flex';
       }
 
       // Services rail — safe DOM creation, no innerHTML
       const railEl = document.getElementById('servicesRail');
-      const allServices = (kb.services || []).slice(0, 6);
+      const allServices = (kb.services || []).map(decodeHtml).slice(0, 6);
       if (allServices.length > 0) {
         railEl.textContent = '';
         allServices.forEach(s => {
@@ -2970,7 +2980,7 @@
       // Hero headline quote — safe textContent
       const heroEl = document.getElementById('heroHeadline');
       if (kb.hero_headline) {
-        heroEl.textContent = '\u201c' + kb.hero_headline + '\u201d';
+        heroEl.textContent = '\u201c' + decodeHtml(kb.hero_headline) + '\u201d';
         heroEl.classList.add('has-content');
       }
 
@@ -2984,7 +2994,13 @@
           primaryG = parseInt(hex.slice(3,5),16);
           primaryB = parseInt(hex.slice(5,7),16);
 
-          // Apply to CSS variables — controls glow, shadow, accent throughout the page
+          // Apply full brand theme — controls all brand-colored elements throughout phase 3
+          const r2 = Math.max(0, primaryR - 30), g2 = Math.max(0, primaryG - 30), b2 = Math.max(0, primaryB - 30);
+          document.documentElement.style.setProperty('--brand',        hex);
+          document.documentElement.style.setProperty('--brand-2',      `rgb(${r2},${g2},${b2})`);
+          document.documentElement.style.setProperty('--brand-muted',  `rgba(${primaryR},${primaryG},${primaryB},0.10)`);
+          document.documentElement.style.setProperty('--brand-border', `rgba(${primaryR},${primaryG},${primaryB},0.25)`);
+          document.documentElement.style.setProperty('--brand-rgb',    `${primaryR},${primaryG},${primaryB}`);
           document.documentElement.style.setProperty('--brand-glow',   `rgba(${primaryR},${primaryG},${primaryB},0.22)`);
           document.documentElement.style.setProperty('--brand-shadow', `rgba(${primaryR},${primaryG},${primaryB},0.12)`);
           document.documentElement.style.setProperty('--brand-accent', hex);
@@ -3047,19 +3063,32 @@
       chatMsgs.appendChild(typingEl);
 
       setTimeout(() => {
-        const welcomeText = `Hi! I'm ${bizName}'s AI assistant. I can answer questions about our services, pricing, and availability. What can I help you with?`;
-        typingEl.innerHTML = `
-          <div class="chat-bubble-ai">${welcomeText}</div>
-          <div class="chat-ts">just now</div>
-        `;
+        const welcomeText = `Hi! I'm ${decodeHtml(bizName)}'s AI assistant. I can answer questions about our services, pricing, and availability. What can I help you with?`;
+        typingEl.textContent = '';
+        const wBubble = document.createElement('div');
+        wBubble.className = 'chat-bubble-ai';
+        wBubble.textContent = welcomeText;
+        const wTs = document.createElement('div');
+        wTs.className = 'chat-ts';
+        wTs.textContent = 'just now';
+        typingEl.appendChild(wBubble);
+        typingEl.appendChild(wTs);
         chatHistory.push({ role: 'assistant', content: welcomeText });
       }, 1200);
 
-      // Chips
+      // Chips — DOM-safe, no innerHTML with user data
       const chipsEl = document.getElementById('chatChips');
-      chipsEl.innerHTML = chips.map(c =>
-        `<button class="chat-chip" onclick="sendPhoneMsg('${c.replace(/'/g,"\\'")}');this.closest('.chat-chips').innerHTML=''">${c}</button>`
-      ).join('');
+      chipsEl.textContent = '';
+      chips.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'chat-chip';
+        btn.textContent = c;
+        btn.addEventListener('click', () => {
+          chipsEl.textContent = '';
+          sendPhoneMsg(c);
+        });
+        chipsEl.appendChild(btn);
+      });
 
       // Share URL
       document.getElementById('shareUrlInput').value = `${location.origin}${location.pathname}?id=${demoData.id || 'demo'}`;
@@ -3123,9 +3152,11 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: demoData.id, message: text, history: chatHistory.slice(-8) }),
         });
+        if (!res.ok) throw new Error('chat_api_error');
         const data = await res.json();
         removeTypingIndicator();
-        const reply = data.reply || data.message || SMART_RESPONSES[smartIdx++ % SMART_RESPONSES.length];
+        if (!data.reply && !data.message) throw new Error('no_reply');
+        const reply = data.reply || data.message;
         appendChatMsg(reply, 'ai');
         chatHistory.push({ role: 'user', content: text });
         chatHistory.push({ role: 'assistant', content: reply });
@@ -3134,10 +3165,7 @@
         }
       } catch {
         removeTypingIndicator();
-        const fallback = SMART_RESPONSES[smartIdx++ % SMART_RESPONSES.length];
-        appendChatMsg(fallback, 'ai');
-        chatHistory.push({ role: 'user', content: text });
-        chatHistory.push({ role: 'assistant', content: fallback });
+        appendChatMsg(CHAT_ERROR_MSG, 'ai');
       }
     }
 
@@ -3172,7 +3200,7 @@
       wrap.innerHTML = `
         <div class="chat-bubble-ai" style="padding-bottom:10px">
           📅 <strong>Book an appointment</strong><br>
-          <button onclick="openBooking()" style="margin-top:8px;padding:6px 14px;background:#3B82F6;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;">Schedule Now →</button>
+          <button onclick="openBooking()" style="margin-top:8px;padding:6px 14px;background:var(--brand,#3B82F6);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;">Schedule Now →</button>
         </div>
         <div class="chat-ts">just now</div>
       `;
@@ -3304,6 +3332,15 @@
     function openWebsitePreview() {
       if (demoData.id) {
         window.open(`/preview.html?id=${encodeURIComponent(demoData.id)}`, '_blank');
+      } else if (demoData.business_name || demoData.kb_json) {
+        // No server-side ID yet — pass via sessionStorage
+        const key = 'demo_local_' + Math.random().toString(36).slice(2, 10);
+        try {
+          sessionStorage.setItem(key, JSON.stringify(demoData));
+          window.open(`/preview.html?local=${encodeURIComponent(key)}`, '_blank');
+        } catch (e) {
+          alert('Preview not available yet — please wait for the demo to finish loading.');
+        }
       }
     }
 
